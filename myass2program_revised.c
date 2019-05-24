@@ -39,92 +39,36 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_ENTRIES 3000
-#define FIRST_LINE 1
+const char *get_data_point(char* line, int num)
+{
+    const char *token;
+    for (token = strtok(line, ","); token && *token; token = strtok(NULL, ",\n"))
+    {
+        if (!--num)
+            return token;
+    }
+    return NULL;
+}
 
-char *months[] = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
-typedef struct{
-    int Year;
-    int months[];
-} year_t;
-
-typedef struct{
-    int Month;
-    int monthly_precipitation;
-    char validity;
-    int has_data;
-    double tau;
-    double mean;
-} month_t;
-
-typedef struct{
-    int station_number;
-    int Year;
-    int Month;
-    double rainfall;
-    char validity;
-} alldata_t;
-
-void bypass_header(int c);
-void read_data(alldata_t *entries);
-
+void read_file(char *file_name)
+{
+    printf("%s\n", file_name);
+    FILE *stream = fopen(file_name, "r");
+    char line[128];
+    while (fgets(line, 128, stream))
+    {
+        char *temp = strdup(line);
+        printf("%s\n", get_data_point(line, 6)); // 1 - 6
+        // create a struct
+        // add struct to a list
+        free(temp);
+    }
+}
 
 int main(int argc, char *argv[]) {
-    alldata_t entries[MAX_ENTRIES];
-    bypass_header(FIRST_LINE);
-    read_data(entries);
+    printf("starting program ... \n");
+    // printf("argc %d\n", argc);
+    printf("reding data from input file: %s\n", argv[1]);
+    read_file(argv[1]);
     return 0;
 }
-
-void bypass_header(int c){
-    int character;
-
-    while((character= getchar())!= EOF){
-        if (character == '\n'){
-            c--;
-            if(c==0){
-                return;
-            }
-        }
-    }
-}
-
-
-
-void read_data(alldata_t *entries){
-
-    int station_number;
-    int Year;
-    int Month;
-    double rainfall;
-    char validity;
-    int i=0;
-    int count;
-
-    while(scanf("IDCJAC0001,%d,%d,%d,%lf,%c\n",&station_number,&Year,&Month,&rainfall,&validity)==5){
-
-        entries[i].station_number = station_number;
-        entries[i].Year = Year;
-        entries[i].Month = Month;
-        entries[i].rainfall = rainfall;
-        entries[i].validity = validity;
-        i++;
-    }
-    printf("S1, site number %06d, %d datalines in input",station_number,i);
-    printf("\n");
-
-    int current_year=entries[1].Year;
-    int current_month;
-
-    for(count=0;count<i;count++){
-        while(entries[count].Year==current_year){
-            printf("S1, %d: ",current_year);
-            printf("\n");
-            current_year++;
-        }
-    }
-    return ;
-}
-
