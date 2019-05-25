@@ -54,7 +54,6 @@ typedef struct
 void read_file(char *file_name, data_point *entries)
 {
     printf("%s\n", file_name);
-    int parsedData;
     int i = 0;
     FILE *stream = fopen(file_name, "r");
     char line[128];
@@ -68,12 +67,8 @@ void read_file(char *file_name, data_point *entries)
     {
         if (i > 0)
         {
-            parsedData = sscanf(line, "%10[^,],%6[^,],%5[^,],%2[^,],%5[^,],%s\n", entries[i].site,
+            sscanf(line, "%10[^,],%6[^,],%5[^,],%2[^,],%5[^,],%s\n", entries[i].site,
                 entries[i].station, entries[i].year, entries[i].month, entries[i].rainfall, entries[i].validated);
-            printf("%i\n", i);
-            printf("%i\n", parsedData);
-            printf("%s %s %s %s %s %s\n", entries[i].site, entries[i].station, entries[i].year,
-                entries[i].month, entries[i].rainfall, entries[i].validated);
         }
         i++;
     }
@@ -81,17 +76,17 @@ void read_file(char *file_name, data_point *entries)
     return;
 }
 
-// void check_data(data_point *entries)
-// {
-//     int i;
-//     for(i=0; i<NUM_RECORDS; i++)
-//     {
-//         printf("%i\n", i);
-//         printf("%s,%s,%i,%s,%1f,%s\n", entries[i].site, entries[i].station,
-//             entries[i].year, entries[i].month, entries[i].rainfall, entries[i].validated);
-//     }
-//     return;
-// }
+void check_data(data_point *entries)
+{
+    int i;
+    for(i=1; i<NUM_RECORDS; i++)
+    {
+        printf("%i\n", i);
+        printf("%s %s %s %s %s %s\n", entries[i].site, entries[i].station, entries[i].year,
+            entries[i].month, entries[i].rainfall, entries[i].validated);
+    }
+    return;
+}
 
 int main(int argc, char *argv[]) {
     printf("starting program ... \n");
@@ -99,6 +94,6 @@ int main(int argc, char *argv[]) {
     data_point entries[NUM_RECORDS];
     printf("reding data from input file: %s\n", argv[1]);
     read_file(argv[1], entries);
-    // check_data(entries);
+    check_data(entries);
     return 0;
 }
