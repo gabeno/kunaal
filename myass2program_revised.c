@@ -43,12 +43,12 @@
 
 typedef struct
 {
-    char site[11];
-    char station[7];
-    char year[5];
-    char month[3];
-    char rainfall[6];
-    char validated[2];
+    // char site[11];
+    int station;
+    int year;
+    int month;
+    float rainfall;
+    char validated;
 } data_point;
 
 void read_file(char *file_name, data_point *entries)
@@ -67,8 +67,8 @@ void read_file(char *file_name, data_point *entries)
     {
         if (i > 0)
         {
-            sscanf(line, "%10[^,],%6[^,],%5[^,],%2[^,],%5[^,],%s\n", entries[i].site,
-                entries[i].station, entries[i].year, entries[i].month, entries[i].rainfall, entries[i].validated);
+            sscanf(line, "IDCJAC0001,%d,%d,%d,%5f,%c",
+                &entries[i].station, &entries[i].year, &entries[i].month, &entries[i].rainfall, &entries[i].validated);
         }
         i++;
     }
@@ -82,7 +82,7 @@ void check_data(data_point *entries)
     for(i=1; i<NUM_RECORDS; i++)
     {
         printf("%i\n", i);
-        printf("%s %s %s %s %s %s\n", entries[i].site, entries[i].station, entries[i].year,
+        printf("IDCJAC0001 %d %d %d %.1f %c\n", entries[i].station, entries[i].year,
             entries[i].month, entries[i].rainfall, entries[i].validated);
     }
     return;
