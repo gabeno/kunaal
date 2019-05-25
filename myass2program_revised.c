@@ -40,6 +40,7 @@
 #include <string.h>
 
 #define NUM_RECORDS 116
+#define MONTHS_IN_YEAR 12
 
 typedef struct
 {
@@ -84,6 +85,47 @@ void check_data(data_point *entries)
         printf("%i\n", i);
         printf("IDCJAC0001 %d %d %d %.1f %c\n", entries[i].station, entries[i].year,
             entries[i].month, entries[i].rainfall, entries[i].validated);
+        printf("%c, %i\n", entries[i].validated, entries[i].validated == 'Y');
+    }
+    return;
+}
+
+void print_summary(data_point *entries)
+{
+    char *months[] = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    int i, j, currentYear, prevYear = 1111, m = 1;
+
+    printf("S1, site number 086039, 115 datalines in input\n");
+    // loop through our data
+    for(j=1; j<NUM_RECORDS; j++)
+    {
+        currentYear = entries[j].year;
+        while (prevYear != currentYear) {
+            printf("S1, ");
+            printf("%d: ", entries[j].year);
+            for(i=1; i<=MONTHS_IN_YEAR; i++)
+            {
+                if (i == entries[m].month) {
+                    if (entries[m].validated == 'N')
+                    {
+                        printf("%4s%s", months[i], "*");
+                    }
+                    else
+                    {
+                        printf("%4s ", months[i]);
+                    }
+                }
+                else
+                {
+                    printf("%*s ", 4, "...");
+                    continue;
+                }
+                m++;
+            }
+            printf("\n");
+            prevYear = currentYear;
+        }
     }
     return;
 }
@@ -94,6 +136,7 @@ int main(int argc, char *argv[]) {
     data_point entries[NUM_RECORDS];
     printf("reding data from input file: %s\n", argv[1]);
     read_file(argv[1], entries);
-    check_data(entries);
+    // check_data(entries);
+    print_summary(entries);
     return 0;
 }
