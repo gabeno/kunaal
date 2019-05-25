@@ -39,36 +39,81 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char *get_data_point(char* line, int num)
-{
-    const char *token;
-    for (token = strtok(line, ","); token && *token; token = strtok(NULL, ",\n"))
-    {
-        if (!--num)
-            return token;
-    }
-    return NULL;
-}
+#define NUM_RECORDS 116
 
-void read_file(char *file_name)
+typedef struct
+{
+    char site[11];
+    char station[7];
+    char year[5];
+    char month[3];
+    char rainfall[6];
+    char validated[2];
+} data_point;
+
+// const char *get_data_point(char* line, int num)
+// {
+//     const char *token;
+//     for (token = strtok(line, ","); token && *token; token = strtok(NULL, ",\n"))
+//     {
+//         if (!--num)
+//             return token;
+//     }
+//     return NULL;
+// }
+
+void read_file(char *file_name, data_point *entries)
 {
     printf("%s\n", file_name);
+    int parsedData;
+    int i = 0;
     FILE *stream = fopen(file_name, "r");
     char line[128];
-    while (fgets(line, 128, stream))
-    {
-        char *temp = strdup(line);
-        printf("%s\n", get_data_point(line, 6)); // 1 - 6
-        // create a struct
-        // add struct to a list
-        free(temp);
+
+    if(stream == NULL) {
+        perror("Failed to open file.");
+        exit(1);
     }
+
+    while (fgets(line, sizeof(line), stream) != NULL && i < NUM_RECORDS)
+    {
+        if (i > 0)
+        {
+            // char *temp = strdup(line);
+            // printf("%s\n", get_data_point(line, 1)); // 1 - 6
+            // entries[i].site = get_data_point(line, 1);
+            // free(temp);
+            parsedData = sscanf(line, "%10[^,],%6[^,],%5[^,],%2[^,],%5[^,],%s\n", entries[i].site,
+                entries[i].station, entries[i].year, entries[i].month, entries[i].rainfall, entries[i].validated);
+            printf("%i\n", i);
+            printf("%i\n", parsedData);
+            printf("%s %s %s %s %s %s\n", entries[i].site, entries[i].station, entries[i].year,
+                entries[i].month, entries[i].rainfall, entries[i].validated);
+        }
+        i++;
+    }
+    fclose(stream);
+    return;
 }
+
+// void check_data(data_point *entries)
+// {
+//     int i;
+//     for(i=0; i<NUM_RECORDS; i++)
+//     {
+//         printf("%i\n", i);
+//         printf("%s,%s,%i,%s,%1f,%s\n", entries[i].site, entries[i].station,
+//             entries[i].year, entries[i].month, entries[i].rainfall, entries[i].validated);
+//     }
+//     return;
+// }
 
 int main(int argc, char *argv[]) {
     printf("starting program ... \n");
     // printf("argc %d\n", argc);
+    data_point entries[NUM_RECORDS];
     printf("reding data from input file: %s\n", argv[1]);
-    read_file(argv[1]);
+    read_file(argv[1], entries);
+    // check_data(entries);
     return 0;
 }
