@@ -52,6 +52,15 @@ typedef struct
     char validated;
 } data_point;
 
+typedef struct
+{
+    int month;
+    int num;
+    float avg;
+} monthly_average;
+
+char *months[] = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
 void read_file(char *file_name, data_point *entries)
 {
     printf("%s\n", file_name);
@@ -82,18 +91,16 @@ void check_data(data_point *entries)
     int i;
     for(i=1; i<NUM_RECORDS; i++)
     {
-        printf("%i\n", i);
+        // printf("%i\n", i);
         printf("IDCJAC0001 %d %d %d %.1f %c\n", entries[i].station, entries[i].year,
             entries[i].month, entries[i].rainfall, entries[i].validated);
-        printf("%c, %i\n", entries[i].validated, entries[i].validated == 'Y');
+        // printf("%c, %i\n", entries[i].validated, entries[i].validated == 'Y');
     }
     return;
 }
 
-void print_summary(data_point *entries)
+void show_rainfall_summary(data_point *entries)
 {
-    char *months[] = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     int i, j, currentYear, prevYear = 1111, m = 1;
 
     printf("S1, site number 086039, 115 datalines in input\n");
@@ -106,7 +113,8 @@ void print_summary(data_point *entries)
             printf("%d: ", entries[j].year);
             for(i=1; i<=MONTHS_IN_YEAR; i++)
             {
-                if (i == entries[m].month) {
+                if (i == entries[m].month)
+                {
                     if (entries[m].validated == 'N')
                     {
                         printf("%4s%s", months[i], "*");
@@ -130,13 +138,58 @@ void print_summary(data_point *entries)
     return;
 }
 
+void get_monthly_averages(data_point *entries, monthly_average *monthly_averages)
+{
+    int i, j;
+    float avg;
+    for(i=1; i<=MONTHS_IN_YEAR; i++)
+    {
+        float sum = 0.0;
+        int count = 0;
+        // printf("%s\n", months[i]);
+        // printf("%i\n", i);
+        for(j=1; j<NUM_RECORDS; j++)
+        {
+            if (i == entries[j].month){
+                // printf("%.1f\n", entries[j].rainfall);
+                sum += entries[j].rainfall;
+                count++;
+            }
+        }
+        // printf("%.1f\n", sum);
+        // printf("%i\n", count);
+        avg = sum / count;
+        // printf("%.1f\n", avg);
+        monthly_averages[i].month = i;
+        monthly_averages[i].avg = avg;
+        monthly_averages[i].num = count;
+    }
+    return;
+}
+
+void show_rainfall_averages(monthly_average *monthly_averages) {
+    int i;
+    for(i=1; i<=MONTHS_IN_YEAR; i++) {
+        printf("S2, ");
+        printf("%s , ", months[monthly_averages[i].month]);
+        printf("%2i ", monthly_averages[i].num);
+        printf("values ");
+        printf("mean of %.1fmm", monthly_averages[i].avg);
+        printf("\n");
+    }
+}
+
+
 int main(int argc, char *argv[]) {
     printf("starting program ... \n");
     // printf("argc %d\n", argc);
     data_point entries[NUM_RECORDS];
+    monthly_average monthly_averages[MONTHS_IN_YEAR];
     printf("reding data from input file: %s\n", argv[1]);
     read_file(argv[1], entries);
     // check_data(entries);
-    print_summary(entries);
+    show_rainfall_summary(entries);
+    get_monthly_averages(entries, monthly_averages);
+    show_rainfall_averages(monthly_averages);
     return 0;
 }
