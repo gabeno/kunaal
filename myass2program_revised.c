@@ -51,17 +51,6 @@ typedef struct
     char validated[2];
 } data_point;
 
-// const char *get_data_point(char* line, int num)
-// {
-//     const char *token;
-//     for (token = strtok(line, ","); token && *token; token = strtok(NULL, ",\n"))
-//     {
-//         if (!--num)
-//             return token;
-//     }
-//     return NULL;
-// }
-
 void read_file(char *file_name, data_point *entries)
 {
     printf("%s\n", file_name);
@@ -79,10 +68,6 @@ void read_file(char *file_name, data_point *entries)
     {
         if (i > 0)
         {
-            // char *temp = strdup(line);
-            // printf("%s\n", get_data_point(line, 1)); // 1 - 6
-            // entries[i].site = get_data_point(line, 1);
-            // free(temp);
             parsedData = sscanf(line, "%10[^,],%6[^,],%5[^,],%2[^,],%5[^,],%s\n", entries[i].site,
                 entries[i].station, entries[i].year, entries[i].month, entries[i].rainfall, entries[i].validated);
             printf("%i\n", i);
