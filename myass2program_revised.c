@@ -231,6 +231,89 @@ void get_tau_by_month(data_point *entries)
     return;
 }
 
+void plot(data_point *entries, monthly_average *monthly_averages, int year)
+{
+    int i, j, k, scale;
+    float max = 0.0;
+    const int MAX_HEIGHT = 24;
+    float values[MONTHS_IN_YEAR] = { 0.0 };
+    int bars[MONTHS_IN_YEAR] = { 0 };
+
+    // get data for specified year
+    for(j=1; j<NUM_RECORDS; j++)
+    {
+        if (year == entries[j].year)
+        {
+            values[entries[j].month] = entries[j].rainfall;
+            if (max < entries[j].rainfall) max = entries[j].rainfall;
+        }
+    }
+    scale = ((int)max + 1) / MAX_HEIGHT;
+
+    // get stats
+    for(i=1; i<=MONTHS_IN_YEAR; i++)
+    {
+        printf("%i - %.1f avg(%.1f) bars->%i avg_pos=%f\n", i, values[i], monthly_averages[i].avg,
+            (int)(values[i]/scale) + 1, monthly_averages[i].avg/scale);
+        bars[i] = (int)(values[i]/scale) + 1;
+    }
+
+    // for(i=MAX_HEIGHT; i>=0; i--)
+    // {
+    //     for(i=1; i<=MONTHS_IN_YEAR; i++)
+    //     {
+    //         plot_values[i].bars = (int)(values[i]/scale) + 1;
+    //     }
+    // }
+
+    printf("S4, %i max is %.1f, scale is %i", year, max, scale);
+    printf("\n");
+
+    for(i=MAX_HEIGHT; i>=0; i--)
+    {
+        if (i == 0)
+        {
+            // x-axis
+            for(j=0; j<=MONTHS_IN_YEAR; j++)
+            {
+                if (i == j)
+                {
+                    printf("  %2i +", i);
+                }
+                else
+                {
+                    printf("-----+");
+                }
+            }
+            printf("\n");
+            for(k=0; k<=MONTHS_IN_YEAR; k++)
+            {
+                printf(" %3s  ", months[k]);
+            }
+        }
+        else
+        {
+            // i > 0 : plot data
+            printf("  %2i |", scale * i);
+            for(k=1; k<=MONTHS_IN_YEAR; k++)
+            {
+                if (i <= bars[k])
+                {
+                    printf("  %2s  ", "03"); // replace this!!
+                }
+                else
+                {
+                    printf("  %2s  ", "  ");
+                }
+            }
+            printf("\n");
+        }
+    }
+
+    printf("\n");
+    return;
+}
+
 int main(int argc, char *argv[]) {
     printf("starting program ... \n");
     // printf("argc %d\n", argc);
@@ -243,5 +326,6 @@ int main(int argc, char *argv[]) {
     get_monthly_averages(entries, monthly_averages);
     show_rainfall_averages(monthly_averages);
     get_tau_by_month(entries);
+    plot(entries, monthly_averages, 2003);
     return 0;
 }
