@@ -198,32 +198,35 @@ void get_tau_by_month(data_point *entries)
             }
         }
 
-        for(x=0; x<n; x++)
+        if (n > 2) // only for 2 or more data points
         {
-            for(y=x+1; y<n; y++)
+            for(x=0; x<n; x++)
             {
-                // printf(" <<(%.1f, %.1f) ", r_values[x], r_values[y]);
-                if(r_values[x] > r_values[y])
+                for(y=x+1; y<n; y++)
                 {
-                    c -= 1;
-                }
-                else if (r_values[x] < r_values[y])
-                {
-                    c += 1;
-                }
-                else if (r_values[x] == r_values[y])
-                {
-                    c += 0;
+                    // printf(" <<(%.1f, %.1f) ", r_values[x], r_values[y]);
+                    if(r_values[x] > r_values[y])
+                    {
+                        c -= 1;
+                    }
+                    else if (r_values[x] < r_values[y])
+                    {
+                        c += 1;
+                    }
+                    else if (r_values[x] == r_values[y])
+                    {
+                        c += 0;
+                    }
                 }
             }
-        }
 
-        // calculate tau
-        tau = c / (.5 * n * (n -1));
-        printf("%2i ", n);
-        printf("values, 2000-2009, tau of ");
-        printf("%5.2f", tau);
-        printf("\n");
+            // calculate tau
+            tau = c / (.5 * n * (n -1));
+            printf("%2i ", n);
+            printf("values, 2000-2009, tau of ");
+            printf("%5.2f", tau);
+            printf("\n");
+        }
     }
     return;
 }
