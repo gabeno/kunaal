@@ -231,12 +231,13 @@ void get_tau_by_month(data_point *entries)
     return;
 }
 
-void plot(data_point *entries, monthly_average *monthly_averages, int year)
+void plot(data_point *entries, monthly_average *monthly_averages, char *yr)
 {
-    int i, j, k, scale, maxYear = 0, minYear = 0, bars[MONTHS_IN_YEAR] = { 0 };
+    int i, j, k, scale, maxYear = 0, minYear = 0, year = atoi(yr), bars[MONTHS_IN_YEAR] = { 0 };
     float max = 0.0;
     const int MAX_HEIGHT = 24;
     float values[MONTHS_IN_YEAR] = { 0.0 };
+    char *marker = &yr[strlen(yr) - 2];
 
     // get data for specified year
     for(j=1; j<NUM_RECORDS; j++)
@@ -255,7 +256,7 @@ void plot(data_point *entries, monthly_average *monthly_averages, int year)
     }
 
     // if year out of range
-    printf("%i, %i\n", maxYear, minYear);
+    // printf("%i, %i\n", maxYear, minYear);
     if (!(year > minYear) && !(year < maxYear)) return;
 
     scale = ((int)max + 1) / MAX_HEIGHT;
@@ -263,8 +264,8 @@ void plot(data_point *entries, monthly_average *monthly_averages, int year)
     // get stats
     for(i=1; i<=MONTHS_IN_YEAR; i++)
     {
-        printf("%i - %.1f avg(%.1f) bars->%i avg_pos=%f\n", i, values[i], monthly_averages[i].avg,
-            (int)(values[i]/scale) + 1, monthly_averages[i].avg/scale);
+        // printf("%i - %.1f avg(%.1f) bars->%i avg_pos=%f\n", i, values[i], monthly_averages[i].avg,
+        //     (int)(values[i]/scale) + 1, monthly_averages[i].avg/scale);
         if (values[i]) bars[i] = (int)(values[i]/scale) + 1;
     }
 
@@ -306,12 +307,15 @@ void plot(data_point *entries, monthly_average *monthly_averages, int year)
                     {
                         if (bars[k] > monthly_averages[k].avg/scale)
                         {
-                            printf(" %1s ", "*03*"); // replace this too!!
+                            // printf(" %1s ", "*03*"); // replace this too!! printf("*%s*", marker);
+                            printf(" *");
+                            printf("%s", marker);
+                            printf("* ");
                         }
                     }
                     else
                     {
-                        printf("  %2s  ", "03"); // replace this!!
+                        printf("  %2s  ", marker);
                     }
                 }
                 else
@@ -339,13 +343,13 @@ int main(int argc, char *argv[]) {
     // printf("argc %d\n", argc);
     data_point entries[NUM_RECORDS];
     monthly_average monthly_averages[MONTHS_IN_YEAR];
-    printf("reding data from input file: %s\n", argv[1]);
+    printf("reading data from input file: %s\n", argv[1]);
     read_file(argv[1], entries);
     // check_data(entries);
     show_rainfall_summary(entries);
     get_monthly_averages(entries, monthly_averages);
     show_rainfall_averages(monthly_averages);
     get_tau_by_month(entries);
-    plot(entries, monthly_averages, 2003);
+    plot(entries, monthly_averages, argv[2]);
     return 0;
 }
