@@ -179,6 +179,54 @@ void show_rainfall_averages(monthly_average *monthly_averages) {
     }
 }
 
+void get_tau_by_month(data_point *entries)
+{
+    int i, j, x, y;
+    for(i=1; i<=MONTHS_IN_YEAR; i++)
+    {
+        int n = 0, c = 0;
+        float tau, r_values[MONTHS_IN_YEAR];
+        printf("S3, %s , ", months[i]);
+        for(j=1; j<NUM_RECORDS; j++)
+        {
+            // printf("<%i>", j);
+            if (i == entries[j].month)
+            {
+                // printf(" %.1f ", entries[j].rainfall);
+                r_values[n] = entries[j].rainfall;
+                n++;
+            }
+        }
+
+        for(x=0; x<n; x++)
+        {
+            for(y=x+1; y<n; y++)
+            {
+                // printf(" <<(%.1f, %.1f) ", r_values[x], r_values[y]);
+                if(r_values[x] > r_values[y])
+                {
+                    c -= 1;
+                }
+                else if (r_values[x] < r_values[y])
+                {
+                    c += 1;
+                }
+                else if (r_values[x] == r_values[y])
+                {
+                    c += 0;
+                }
+            }
+        }
+
+        // calculate tau
+        tau = c / (.5 * n * (n -1));
+        printf("%2i ", n);
+        printf("values, 2000-2009, tau of ");
+        printf("%5.2f", tau);
+        printf("\n");
+    }
+    return;
+}
 
 int main(int argc, char *argv[]) {
     printf("starting program ... \n");
@@ -191,5 +239,6 @@ int main(int argc, char *argv[]) {
     show_rainfall_summary(entries);
     get_monthly_averages(entries, monthly_averages);
     show_rainfall_averages(monthly_averages);
+    get_tau_by_month(entries);
     return 0;
 }
